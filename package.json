@@ -1,0 +1,22 @@
+{
+  "name": "legra",
+  "version": "0.0.1",
+  "description": "A different kinda of graphics library... Coming soon!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pshihn/legra.git"
+  },
+  "keywords": [
+    "graphics"
+  ],
+  "author": "Preet Shihn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pshihn/legra/issues"
+  },
+  "homepage": "https://github.com/pshihn/legra#readme"
+}
