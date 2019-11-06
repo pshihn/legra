@@ -46,7 +46,25 @@ function drawBrick(i: number, j: number, ctx: CanvasRenderingContext2D, style: B
   _drawBrick(ctx, i * size, j * size, style);
 }
 
-function drawBrickList(points: Point[], ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+function drawBrickList(points: Point[], ctx: CanvasRenderingContext2D, style: BrickStyleResolved, sort = false) {
+  if (sort) {
+    points.sort((a, b) => {
+      if (a[0] === b[0]) {
+        if (a[1] < b[1]) {
+          return -1;
+        } else if (a[1] > b[1]) {
+          return 1;
+        }
+        return 0;
+      }
+      if (a[0] < b[0]) {
+        return -1;
+      } else if (a[0] > b[0]) {
+        return 1;
+      }
+      return 0;
+    });
+  }
   const size = style.brickSize;
   points.forEach((p) => {
     _drawBrick(ctx, p[0] * size, p[1] * size, style);
@@ -102,20 +120,14 @@ export function rectangle(x: number, y: number, width: number, height: number, f
       }
     }
   } else {
-    const used = new Set<string>();
     if (width > 0 && height > 0) {
-      let bricks = _line(x, y, x + width - 1, y, used);
-      if (height > 2) {
-        bricks = [
-          ...bricks,
-          ..._line(x, y + 1, x, y + height - 2, used),
-          ..._line(x + width - 1, y + 1, x + width - 1, y + height - 2, used)
-        ];
-      }
-      if (height > 1) {
-        bricks = [...bricks, ..._line(x, y + height - 1, x + width - 1, y + height - 1, used)];
-      }
-      drawBrickList(bricks, ctx, style);
+      linearPath([
+        [x, y],
+        [x + width - 1, y],
+        [x + width - 1, y + height - 1],
+        [x, y + height - 1],
+        [x, y]
+      ], ctx, style);
     }
   }
 }
@@ -133,5 +145,55 @@ export function linearPath(points: Point[], ctx: CanvasRenderingContext2D, style
     const bp = _line(x1, y1, x2, y2, used);
     bricks = [...bricks, ...bp];
   }
-  drawBrickList(bricks, ctx, style);
+  drawBrickList(bricks, ctx, style, true);
+}
+
+export function ellipse(xc: number, yc: number, a: number, b: number, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+  if (!filled) {
+    const bricks: Point[] = [];
+    let x = 0;
+    let y = b;
+    const a2 = a * a;
+    const b2 = b * b;
+    const crit1 = -(a2 / 4 + a % 2 + b2);
+    const crit2 = -(b2 / 4 + b % 2 + a2);
+    const crit3 = -(b2 / 4 + b % 2);
+    let t = -a2 * y;
+    let dxt = 2 * b2 * x;
+    let dyt = -2 * a2 * y;
+    const d2xt = 2 * b2;
+    const d2yt = 2 * a2;
+
+    const incx = () => {
+      x++;
+      dxt += d2xt;
+      t += dxt;
+    };
+
+    const incy = () => {
+      y--;
+      dyt += d2yt;
+      t += dyt;
+    };
+
+    while (y >= 0 && x <= a) {
+      bricks.push([xc + x, yc + y]);
+      if (x !== 0 || y !== 0) {
+        bricks.push([xc - x, yc - y]);
+      }
+      if (x !== 0 && y !== 0) {
+        bricks.push([xc + x, yc - y]);
+        bricks.push([xc - x, yc + y]);
+      }
+      if ((t + b2 * x <= crit1) || (t + a2 * y <= crit3)) {
+        incx();
+      } else if (t - a2 * y > crit2) {
+        incy();
+      } else {
+        incx();
+        incy();
+      }
+    }
+    drawBrickList(bricks, ctx, style, true);
+  }
 }
