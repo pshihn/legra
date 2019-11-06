@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 16px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas width="800" height="800"></canvas>
+
+  <script type="module">
+    import { rectangle } from '../bin/legra-core.js';
+
+    const ctx = document.querySelector('canvas').getContext('2d');
+
+    const styles = {
+      brickSize: 24,
+      color: 'red',
+      elevation: 1
+    };
+
+    rectangle(2, 2, 8, 3, ctx, styles);
+
+    console.log(rectangle);
+  </script>
+</body>
+
+</html>
