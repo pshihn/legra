@@ -16,7 +16,7 @@
   <canvas width="800" height="800"></canvas>
 
   <script type="module">
-    import { rectangle } from '../bin/legra-core.js';
+    import { rectangle, line } from '../bin/legra-core.js';
 
     const ctx = document.querySelector('canvas').getContext('2d');
 
@@ -26,7 +26,15 @@
       elevation: 1
     };
 
-    rectangle(2, 2, 8, 3, ctx, styles);
+    // rectangle(2, 2, 8, 8, ctx, styles);
+    // styles.color = 'green';
+    // rectangle(12, 2, 8, 6, ctx, styles);
+    // styles.color = 'red';
+
+    // line(1, 1, 10, 1, ctx, styles);
+    // line(1, 3, 1, 10, ctx, styles);
+    // line(11, 11, 1, 2, ctx, styles);
+
 
     console.log(rectangle);
   </script>
