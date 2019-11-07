@@ -328,10 +328,11 @@ export function polygon(points: Point[], filled: boolean, ctx: CanvasRenderingCo
       const p1 = vertices[i];
       const p2 = vertices[i + 1];
       if (p1[1] !== p2[1]) {
+        const ymin = Math.min(p1[1], p2[1]);
         edges.push({
+          ymin,
           ymax: Math.max(p1[1], p2[1]),
-          ymin: Math.min(p1[1], p2[1]),
-          x: Math.min(p1[0], p2[0]),
+          x: ymin === p1[1] ? p1[0] : p2[0],
           islope: (p2[0] - p1[0]) / (p2[1] - p1[1])
         });
       }
@@ -351,6 +352,8 @@ export function polygon(points: Point[], filled: boolean, ctx: CanvasRenderingCo
       }
       return 0;
     });
+
+    console.log('edges', JSON.parse(JSON.stringify(edges)));
 
     let activeEdges: ActiveEdgeEntry[] = [];
     let y = edges[0].ymin;
