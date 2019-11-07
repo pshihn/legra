@@ -19,6 +19,18 @@ export interface BrickStyleResolved extends BrickStyle {
   elevation: number;
 }
 
+interface EdgeEntry {
+  ymin: number;
+  ymax: number;
+  x: number;
+  islope: number;
+}
+
+interface ActiveEdgeEntry {
+  s: number;
+  edge: EdgeEntry;
+}
+
 const radiusCache = new Map<number, number>();
 function calculateRadius(size: number): number {
   if (radiusCache.has(size)) {
@@ -119,6 +131,21 @@ function _line(x1: number, y1: number, x2: number, y2: number, used = new Set<st
   return points;
 }
 
+function _linearPath(points: Point[], used = new Set<string>()): Point[] {
+  let bricks: Point[] = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const [x1, y1] = points[i];
+    const [x2, y2] = points[i + 1];
+    const bp = _line(x1, y1, x2, y2, used);
+    bricks = [...bricks, ...bp];
+  }
+  return bricks;
+}
+
+/**********************
+ * EXPORTED FUNCTIONS
+ **********************/
+
 export function rectangle(x: number, y: number, width: number, height: number, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
   if (filled) {
     for (let i = 0; i < width; i++) {
@@ -144,15 +171,7 @@ export function line(x1: number, y1: number, x2: number, y2: number, ctx: Canvas
 }
 
 export function linearPath(points: Point[], ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
-  const used = new Set<string>();
-  let bricks: Point[] = [];
-  for (let i = 0; i < points.length - 1; i++) {
-    const [x1, y1] = points[i];
-    const [x2, y2] = points[i + 1];
-    const bp = _line(x1, y1, x2, y2, used);
-    bricks = [...bricks, ...bp];
-  }
-  drawBrickList(bricks, ctx, style, true);
+  drawBrickList(_linearPath(points), ctx, style, true);
 }
 
 export function circle(xc: number, yc: number, radius: number, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
@@ -275,6 +294,110 @@ export function ellipse(xc: number, yc: number, a: number, b: number, filled: bo
         incy();
       }
     }
+    drawBrickList(bricks, ctx, style, true);
+  }
+}
+
+export function polygon(points: Point[], filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+  if (points.length === 0) {
+    return;
+  }
+  if (points.length === 1) {
+    drawBrick(points[0][0], points[0][1], ctx, style);
+    return;
+  }
+  if (points.length === 2) {
+    const [[x1, y1], [x2, y2]] = points;
+    line(x1, y1, x2, y2, ctx, style);
+    return;
+  }
+  const vertices = [...points];
+  if (vertices[0].join(',') !== vertices[vertices.length - 1].join(',')) {
+    vertices.push([vertices[0][0], vertices[0][1]]);
+  }
+
+  if (!filled) {
+    linearPath(vertices, ctx, style);
+  } else {
+    const used = new Set<string>();
+    let bricks = _linearPath(vertices, used);
+
+    // Create sorted edges table
+    const edges: EdgeEntry[] = [];
+    for (let i = 0; i < vertices.length - 1; i++) {
+      const p1 = vertices[i];
+      const p2 = vertices[i + 1];
+      if (p1[1] !== p2[1]) {
+        edges.push({
+          ymax: Math.max(p1[1], p2[1]),
+          ymin: Math.min(p1[1], p2[1]),
+          x: Math.min(p1[0], p2[0]),
+          islope: (p2[0] - p1[0]) / (p2[1] - p1[1])
+        });
+      }
+    }
+    edges.sort((e1, e2) => {
+      if (e1.ymin < e2.ymin) {
+        return -1;
+      }
+      if (e1.ymin > e2.ymin) {
+        return 1;
+      }
+      if (e1.x < e2.x) {
+        return -1;
+      }
+      if (e1.x > e2.x) {
+        return 1;
+      }
+      return 0;
+    });
+
+    let activeEdges: ActiveEdgeEntry[] = [];
+    let y = edges[0].ymin;
+    while (activeEdges.length || edges.length) {
+      if (edges.length) {
+        let ix = 0;
+        for (let i = 0; i < edges.length; i++) {
+          if (edges[i].ymin > y) {
+            break;
+          }
+          ix = i;
+        }
+        const removed = edges.splice(0, ix + 1);
+        removed.forEach((edge) => {
+          activeEdges.push({ s: y, edge });
+        });
+      }
+      activeEdges = activeEdges.filter((ae) => {
+        if (ae.edge.ymax === y) {
+          return false;
+        }
+        return true;
+      });
+      activeEdges.sort((ae1, ae2) => {
+        return (ae1.edge.x - ae2.edge.x) / Math.abs((ae1.edge.x - ae2.edge.x));
+      });
+
+      // draw the edges
+      if (activeEdges.length > 1) {
+        for (let i = 0; i < activeEdges.length; i = i + 2) {
+          const nexti = i + 1;
+          if (nexti >= activeEdges.length) {
+            break;
+          }
+          const ce = activeEdges[i].edge;
+          const ne = activeEdges[nexti].edge;
+          bricks = bricks.concat(_line(Math.round(ce.x), y, Math.round(ne.x), y, used));
+        }
+      }
+      console.log('draw', y, activeEdges.map((e) => e.edge.x));
+
+      y++;
+      activeEdges.forEach((ae) => {
+        ae.edge.x = ae.edge.x + ae.edge.islope;
+      });
+    }
+    console.log('done', activeEdges);
     drawBrickList(bricks, ctx, style, true);
   }
 }
