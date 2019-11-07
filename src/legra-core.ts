@@ -350,16 +350,17 @@ export function polygon(points: Point[], filled: boolean, ctx: CanvasRenderingCo
       if (e1.x > e2.x) {
         return 1;
       }
-      return 0;
+      if (e1.ymax === e2.ymax) {
+        return 0;
+      }
+      return (e1.ymax - e2.ymax) / Math.abs((e1.ymax - e2.ymax));
     });
-
-    console.log('edges', JSON.parse(JSON.stringify(edges)));
 
     let activeEdges: ActiveEdgeEntry[] = [];
     let y = edges[0].ymin;
     while (activeEdges.length || edges.length) {
       if (edges.length) {
-        let ix = 0;
+        let ix = -1;
         for (let i = 0; i < edges.length; i++) {
           if (edges[i].ymin > y) {
             break;
@@ -378,10 +379,13 @@ export function polygon(points: Point[], filled: boolean, ctx: CanvasRenderingCo
         return true;
       });
       activeEdges.sort((ae1, ae2) => {
+        if (ae1.edge.x === ae2.edge.x) {
+          return 0;
+        }
         return (ae1.edge.x - ae2.edge.x) / Math.abs((ae1.edge.x - ae2.edge.x));
       });
 
-      // draw the edges
+      // fill between the edges
       if (activeEdges.length > 1) {
         for (let i = 0; i < activeEdges.length; i = i + 2) {
           const nexti = i + 1;
@@ -393,14 +397,12 @@ export function polygon(points: Point[], filled: boolean, ctx: CanvasRenderingCo
           bricks = bricks.concat(_line(Math.round(ce.x), y, Math.round(ne.x), y, used));
         }
       }
-      console.log('draw', y, activeEdges.map((e) => e.edge.x));
 
       y++;
       activeEdges.forEach((ae) => {
         ae.edge.x = ae.edge.x + ae.edge.islope;
       });
     }
-    console.log('done', activeEdges);
     drawBrickList(bricks, ctx, style, true);
   }
 }
