@@ -1,5 +1,12 @@
 export type Point = [number, number];
 
+export interface Rectangle {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface BrickStyle {
   brickSize?: number;
   color?: string;
@@ -148,34 +155,108 @@ export function linearPath(points: Point[], ctx: CanvasRenderingContext2D, style
   drawBrickList(bricks, ctx, style, true);
 }
 
+export function circle(xc: number, yc: number, radius: number, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+  ellipse(xc, yc, radius, radius, filled, ctx, style);
+}
+
 export function ellipse(xc: number, yc: number, a: number, b: number, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
-  if (!filled) {
+  let x = 0;
+  let y = b;
+
+  const a2 = a * a;
+  const b2 = b * b;
+  const crit1 = -(a2 / 4 + a % 2 + b2);
+  const crit2 = -(b2 / 4 + b % 2 + a2);
+  const crit3 = -(b2 / 4 + b % 2);
+  let t = -a2 * y;
+  let dxt = 2 * b2 * x;
+  let dyt = -2 * a2 * y;
+  const d2xt = 2 * b2;
+  const d2yt = 2 * a2;
+
+  const incx = () => {
+    x++;
+    dxt += d2xt;
+    t += dxt;
+  };
+  const incy = () => {
+    y--;
+    dyt += d2yt;
+    t += dyt;
+  };
+
+  if (filled) {
+    const rects: Rectangle[] = [];
+    let rx = x;
+    let ry = y;
+    let width = 1;
+    let height = 1;
+
+    const rectPush = (x: number, y: number, width: number, height: number) => {
+      if (height < 0) {
+        y += height + 1;
+        height = Math.abs(height);
+      }
+      rects.push({ x, y, width, height });
+    };
+
+    if (b === 0) {
+      rectPush(xc - 1, yc, 2 * a + 1, 1);
+    } else {
+      while (y >= 0 && x <= a) {
+        if ((t + b2 * x <= crit1) || (t + a2 * y <= crit3)) {
+          if (height === 1) {
+            // do nothing;
+          } else if ((ry * 2 + 1) > ((height - 1) * 2)) {
+            rectPush(xc - rx, yc - ry, width, height - 1);
+            rectPush(xc - rx, yc + ry, width, 1 - height);
+            ry -= height - 1;
+            height = 1;
+          } else {
+            rectPush(xc - rx, yc - ry, width, ry * 2 + 1);
+            ry -= ry;
+            height = 1;
+          }
+          incx();
+          rx++;
+          width += 2;
+        } else if ((t - a2 * y) > crit2) {
+          incy();
+          height++;
+        } else {
+          if ((ry * 2 + 1) > (height * 2)) {
+            rectPush(xc - rx, yc - ry, width, height);
+            rectPush(xc - rx, yc + ry, width, -height);
+          } else {
+            rectPush(xc - rx, yc - ry, width, ry * 2 + 1);
+          }
+          incx();
+          incy();
+          rx++;
+          width += 2;
+          ry -= height;
+          height = 1;
+        }
+      }
+      if (ry > height) {
+        rectPush(xc - rx, yc - ry, width, height);
+        rectPush(xc - rx, yc + ry + 1, width, -height);
+      } else {
+        rectPush(xc - rx, yc - ry, width, ry * 2 + 1);
+      }
+    }
+    rects.forEach((rect) => {
+      if (rect.height < 0) {
+        rect.y += rect.height + 1;
+        rect.height = Math.abs(rect.height);
+      }
+    });
+    rects.sort((a, b) => {
+      return a.y - b.y;
+    });
+    rects.forEach((rect) => rectangle(rect.x, rect.y, rect.width, rect.height, true, ctx, style));
+  } else {
     const bricks: Point[] = [];
-    let x = 0;
-    let y = b;
-    const a2 = a * a;
-    const b2 = b * b;
-    const crit1 = -(a2 / 4 + a % 2 + b2);
-    const crit2 = -(b2 / 4 + b % 2 + a2);
-    const crit3 = -(b2 / 4 + b % 2);
-    let t = -a2 * y;
-    let dxt = 2 * b2 * x;
-    let dyt = -2 * a2 * y;
-    const d2xt = 2 * b2;
-    const d2yt = 2 * a2;
-
-    const incx = () => {
-      x++;
-      dxt += d2xt;
-      t += dxt;
-    };
-
-    const incy = () => {
-      y--;
-      dyt += d2yt;
-      t += dyt;
-    };
-
     while (y >= 0 && x <= a) {
       bricks.push([xc + x, yc + y]);
       if (x !== 0 || y !== 0) {

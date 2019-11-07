@@ -16,7 +16,7 @@
   <canvas width="800" height="800"></canvas>
 
   <script type="module">
-    import { rectangle, line, linearPath, ellipse } from '../bin/legra-core.js';
+    import { rectangle, line, linearPath, ellipse, circle } from '../bin/legra-core.js';
 
     const ctx = document.querySelector('canvas').getContext('2d');
 
@@ -34,7 +34,17 @@
     // rectangle(12, 2, 8, 8, false, ctx, styles);
 
     // ellipse
-    ellipse(15, 15, 12, 12, false, ctx, styles);
+    // ellipse(15, 15, 12, 12, true, ctx, styles);
+    // styles.color = 'pink';
+    // ellipse(15, 15, 10, 6, true, ctx, styles);
+
+    // circle
+    circle(15, 15, 12, false, ctx, styles);
+    styles.color = 'green';
+    circle(15, 15, 8, true, ctx, styles);
+    styles.color = 'pink';
+    circle(15, 15, 5, true, ctx, styles);
+
 
 
     // lines
