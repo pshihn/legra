@@ -1,7 +1,7 @@
 import { BrickRenderOptions, BrickRenderOptionsResolved, line, linearPath, rectangle, circle, ellipse, polygon, arc, bezierCurve, quadraticCurve } from './legra-core.js';
 import { Point } from './geometry.js';
 
-export class Legra {
+export default class Legra {
   private ctx: CanvasRenderingContext2D;
   private defaultOptions: BrickRenderOptionsResolved = {
     brickSize: 24,
