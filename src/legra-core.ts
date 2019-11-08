@@ -1,11 +1,4 @@
-export type Point = [number, number];
-
-export interface Rectangle {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+import { Point, Rectangle, EdgeEntry, ActiveEdgeEntry } from './geometry.js';
 
 export interface BrickStyle {
   brickSize?: number;
@@ -17,18 +10,6 @@ export interface BrickStyleResolved extends BrickStyle {
   brickSize: number;
   color: string;
   elevation: number;
-}
-
-interface EdgeEntry {
-  ymin: number;
-  ymax: number;
-  x: number;
-  islope: number;
-}
-
-interface ActiveEdgeEntry {
-  s: number;
-  edge: EdgeEntry;
 }
 
 const radiusCache = new Map<number, number>();
