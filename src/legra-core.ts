@@ -1,16 +1,15 @@
 import { Point, Rectangle, EdgeEntry, ActiveEdgeEntry } from './geometry.js';
 import { Bezier } from './bezier.js';
 
-export interface BrickStyle {
-  brickSize?: number;
+export interface BrickRenderOptions {
   color?: string;
-  elevation?: number;
+  filled?: boolean;
 }
 
-export interface BrickStyleResolved extends BrickStyle {
+export interface BrickRenderOptionsResolved extends BrickRenderOptions {
   brickSize: number;
   color: string;
-  elevation: number;
+  filled: boolean;
 }
 
 const radiusCache = new Map<number, number>();
@@ -23,7 +22,7 @@ function calculateRadius(size: number): number {
   return r;
 }
 
-function _drawBrick(ctx: CanvasRenderingContext2D, x: number, y: number, style: BrickStyleResolved) {
+function _drawBrick(ctx: CanvasRenderingContext2D, x: number, y: number, style: BrickRenderOptionsResolved) {
   const { brickSize, color } = style;
   ctx.save();
   ctx.fillStyle = color;
@@ -42,12 +41,12 @@ function _drawBrick(ctx: CanvasRenderingContext2D, x: number, y: number, style: 
   ctx.restore();
 }
 
-function drawBrick(i: number, j: number, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+function drawBrick(i: number, j: number, ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved) {
   const size = style.brickSize;
   _drawBrick(ctx, i * size, j * size, style);
 }
 
-function drawBrickList(points: Point[], ctx: CanvasRenderingContext2D, style: BrickStyleResolved, sort = false) {
+function drawBrickList(points: Point[], ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved, sort = false) {
   if (sort) {
     points.sort((a, b) => {
       if (a[0] === b[0]) {
@@ -128,8 +127,8 @@ function _linearPath(points: Point[], used = new Set<string>()): Point[] {
  * EXPORTED FUNCTIONS
  **********************/
 
-export function rectangle(x: number, y: number, width: number, height: number, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
-  if (filled) {
+export function rectangle(x: number, y: number, width: number, height: number, ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved, fill = false) {
+  if (style.filled || fill) {
     for (let i = 0; i < width; i++) {
       for (let j = 0; j < height; j++) {
         drawBrick(x + i, y + j, ctx, style);
@@ -148,19 +147,19 @@ export function rectangle(x: number, y: number, width: number, height: number, f
   }
 }
 
-export function line(x1: number, y1: number, x2: number, y2: number, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+export function line(x1: number, y1: number, x2: number, y2: number, ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved) {
   drawBrickList(_line(x1, y1, x2, y2), ctx, style);
 }
 
-export function linearPath(points: Point[], ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+export function linearPath(points: Point[], ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved) {
   drawBrickList(_linearPath(points), ctx, style, true);
 }
 
-export function circle(xc: number, yc: number, radius: number, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
-  ellipse(xc, yc, radius, radius, filled, ctx, style);
+export function circle(xc: number, yc: number, radius: number, ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved) {
+  ellipse(xc, yc, radius, radius, ctx, style);
 }
 
-export function ellipse(xc: number, yc: number, a: number, b: number, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+export function ellipse(xc: number, yc: number, a: number, b: number, ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved) {
   let x = 0;
   let y = b;
 
@@ -186,7 +185,7 @@ export function ellipse(xc: number, yc: number, a: number, b: number, filled: bo
     t += dyt;
   };
 
-  if (filled) {
+  if (style.filled) {
     const rects: Rectangle[] = [];
     let rx = x;
     let ry = y;
@@ -255,7 +254,7 @@ export function ellipse(xc: number, yc: number, a: number, b: number, filled: bo
     rects.sort((a, b) => {
       return a.y - b.y;
     });
-    rects.forEach((rect) => rectangle(rect.x, rect.y, rect.width, rect.height, true, ctx, style));
+    rects.forEach((rect) => rectangle(rect.x, rect.y, rect.width, rect.height, ctx, style, true));
   } else {
     const bricks: Point[] = [];
     while (y >= 0 && x <= a) {
@@ -280,7 +279,7 @@ export function ellipse(xc: number, yc: number, a: number, b: number, filled: bo
   }
 }
 
-export function polygon(points: Point[], filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+export function polygon(points: Point[], ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved) {
   if (points.length === 0) {
     return;
   }
@@ -298,7 +297,7 @@ export function polygon(points: Point[], filled: boolean, ctx: CanvasRenderingCo
     vertices.push([vertices[0][0], vertices[0][1]]);
   }
 
-  if (!filled) {
+  if (!style.filled) {
     linearPath(vertices, ctx, style);
   } else {
     const used = new Set<string>();
@@ -389,7 +388,7 @@ export function polygon(points: Point[], filled: boolean, ctx: CanvasRenderingCo
   }
 }
 
-export function arc(xc: number, yc: number, a: number, b: number, start: number, stop: number, closed: boolean, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+export function arc(xc: number, yc: number, a: number, b: number, start: number, stop: number, closed: boolean, ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved) {
   let angle1 = Math.min(start, stop);
   let angle2 = Math.max(start, stop);
   if (angle1 === angle2) {
@@ -425,27 +424,27 @@ export function arc(xc: number, yc: number, a: number, b: number, start: number,
       used.add(key);
       points.push(point);
     }
-    polygon(points, filled, ctx, style);
+    polygon(points, ctx, style);
   } else {
     linearPath(points, ctx, style);
   }
 }
 
-export function bezierCurve(x1: number, y1: number, cp1x: number, cp1y: number, cp2x: number, cp2y: number, x2: number, y2: number, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+export function bezierCurve(x1: number, y1: number, cp1x: number, cp1y: number, cp2x: number, cp2y: number, x2: number, y2: number, ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved) {
   const bezier = new Bezier([x1, y1], [cp1x, cp1y], [cp2x, cp2y], [x2, y2]);
   const luts = bezier.getLUT(bezier.length()).map<Point>((p) => [Math.round(p[0]), Math.round(p[1])]);
-  if (filled) {
-    polygon(luts, true, ctx, style);
+  if (style.filled) {
+    polygon(luts, ctx, style);
   } else {
     linearPath(luts, ctx, style);
   }
 }
 
-export function quadraticCurve(x1: number, y1: number, cpx: number, cpy: number, x2: number, y2: number, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+export function quadraticCurve(x1: number, y1: number, cpx: number, cpy: number, x2: number, y2: number, ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved) {
   const bezier = new Bezier([x1, y1], [cpx, cpy], [x2, y2]);
   const luts = bezier.getLUT(bezier.length()).map<Point>((p) => [Math.round(p[0]), Math.round(p[1])]);
-  if (filled) {
-    polygon(luts, true, ctx, style);
+  if (style.filled) {
+    polygon(luts, ctx, style);
   } else {
     linearPath(luts, ctx, style);
   }

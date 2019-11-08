@@ -16,100 +16,58 @@
   <canvas width="800" height="800"></canvas>
 
   <script type="module">
-    import { rectangle, line, linearPath, ellipse, circle, polygon, arc, bezierCurve, quadraticCurve } from '../bin/legra-core.js';
+    import { Legra } from '../bin/legra.js';
 
     const ctx = document.querySelector('canvas').getContext('2d');
-
-    const styles = {
-      brickSize: 24,
-      color: 'red',
-      elevation: 1
-    };
+    const legra = new Legra(ctx);
 
     // rectangles
-    // rectangle(2, 2, 8, 8, true, ctx, styles);
-    // styles.color = 'green';
-    // rectangle(2, 2, 6, 6, true, ctx, styles);
-    // styles.color = 'pink';
-    // rectangle(12, 2, 8, 8, false, ctx, styles);
+    // legra.rectangle(2, 2, 8, 8, { filled: true });
+    // legra.rectangle(2, 2, 6, 6, { filled: true, color: 'green' });
+    // legra.rectangle(12, 2, 8, 8, { color: 'pink' });
 
     // ellipse
-    // ellipse(15, 15, 12, 12, true, ctx, styles);
-    // styles.color = 'pink';
-    // ellipse(15, 15, 10, 6, true, ctx, styles);
-
-    // circle
-    // circle(15, 15, 12, false, ctx, styles);
-    // styles.color = 'green';
-    // circle(15, 15, 8, true, ctx, styles);
-    // styles.color = 'pink';
-    // circle(15, 15, 5, true, ctx, styles);
+    // legra.circle(15, 15, 12);
+    // legra.ellipse(15, 15, 10, 6, { filled: true, color: 'green' });
 
     // lines
-    // line(1, 1, 10, 1, ctx, styles);
-    // line(1, 3, 1, 10, ctx, styles);
-    // line(11, 11, 1, 2, ctx, styles);
+    // legra.line(3, 1, 10, 1);
+    // legra.line(1, 3, 1, 10);
+    // legra.line(11, 11, 1, 1, { color: 'red' });
 
     // Linear path
-    // linearPath([
+    // legra.linearPath([
     //   [1, 1],
     //   [10, 1],
     //   [10, 10],
     //   [1, 10],
     //   [1, 1]
-    // ], ctx, styles);
-    // linearPath([
+    // ]);
+    // legra.linearPath([
     //   [1, 1],
     //   [10, 1],
     //   [15, 10],
-    //   [1, 20],
-    //   [1, 1]
-    // ], ctx, styles);
+    //   [1, 20]
+    // ], { color: 'pink' });
 
     // Polygon
-    // polygon([
+    // legra.polygon([
     //   [3, 10],
     //   [22, 18],
     //   [30, 1],
     //   [14, 10],
     //   [8, 2]
-    // ], true, ctx, styles);
-    // styles.color = 'pink';
-    // polygon([
-    //   [1, 13],
-    //   [1, 22],
-    //   [10, 22],
-    //   [10, 13]
-    // ], true, ctx, styles);
-    // diamond
-    // polygon([
-    //   [8, 2],
-    //   [3, 10],
-    //   [8, 18],
-    //   [13, 10]
-    // ], true, ctx, styles)
-    // fish
-    // polygon([
-    //   [2, 2],
-    //   [2, 8],
-    //   [8, 12],
-    //   [20, 2],
-    //   [20, 8],
-    //   [14, 2]
-    // ], false, ctx, styles)
+    // ], { filled: true, color: 'lightgray' });
 
-    // arc(15, 15, 14, 14, Math.PI, Math.PI * 1.6, true, true, ctx, styles);
+    // legra.arc(15, 15, 14, 14, Math.PI, Math.PI * 1.6, true, { filled: false, color: 'pink' });
 
     // BEZIER
-    // styles.brickSize = 20;
-    // bezierCurve(3, 3, 8, 30, 18, 1, 22, 14, false, ctx, styles);
-    // styles.brickSize = 5;
-    // bezierCurve(68, 145, 74, 6, 143, 197, 138, 55, false, ctx, styles);
+    // legra.bezierCurve(3, 3, 8, 30, 18, 1, 22, 14, { color: 'green' });
 
     // QUADRATIC
     // styles.brickSize = 10;
-    // quadraticCurve(5, 2, 23, 3, 5, 10, false, ctx, styles);
-    // quadraticCurve(2, 11, 23, 15, 25, 2, false, ctx, styles);
+    // legra.quadraticCurve(5, 2, 23, 3, 5, 10);
+    // legra.quadraticCurve(2, 11, 23, 15, 25, 2, { color: 'pink', filled: true });
 
   </script>
 </body>
