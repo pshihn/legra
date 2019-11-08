@@ -2,7 +2,6 @@
 .DS_Store
 .vscode
 node_modules
-bin
 src
 .gitignore
 tsconfig.json
