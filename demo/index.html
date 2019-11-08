@@ -16,7 +16,7 @@
   <canvas width="800" height="800"></canvas>
 
   <script type="module">
-    import { rectangle, line, linearPath, ellipse, circle, polygon } from '../bin/legra-core.js';
+    import { rectangle, line, linearPath, ellipse, circle, polygon, arc } from '../bin/legra-core.js';
 
     const ctx = document.querySelector('canvas').getContext('2d');
 
@@ -82,13 +82,12 @@
     //   [10, 13]
     // ], true, ctx, styles);
     // diamond
-    polygon([
-      [8, 2],
-      [3, 10],
-      [8, 18],
-      [13, 10]
-    ], true, ctx, styles)
-
+    // polygon([
+    //   [8, 2],
+    //   [3, 10],
+    //   [8, 18],
+    //   [13, 10]
+    // ], true, ctx, styles)
     // fish
     // polygon([
     //   [2, 2],
@@ -98,6 +97,9 @@
     //   [20, 8],
     //   [14, 2]
     // ], false, ctx, styles)
+
+    arc(15, 15, 14, 14, Math.PI, Math.PI * 1.6, true, true, ctx, styles);
+    // export function arc(xc: number, yc: number, a: number, b: number, start: number, stop: number, closed: boolean, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
 
   </script>
 </body>

@@ -406,3 +406,45 @@ export function polygon(points: Point[], filled: boolean, ctx: CanvasRenderingCo
     drawBrickList(bricks, ctx, style, true);
   }
 }
+
+export function arc(xc: number, yc: number, a: number, b: number, start: number, stop: number, closed: boolean, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+  let angle1 = Math.min(start, stop);
+  let angle2 = Math.max(start, stop);
+  if (angle1 === angle2) {
+    return;
+  }
+  if (a <= 0 || b <= 0) {
+    return;
+  }
+  if (angle2 - angle1 > Math.PI * 2) {
+    angle1 = 0;
+    angle2 = Math.PI * 2;
+  }
+  const p = Math.round(2 * Math.sqrt((a * a + b * b) / 2) * (angle2 - angle1));
+  const da = (angle2 - angle1) / p;
+  const used = new Set<string>();
+  const points: Point[] = [];
+  for (let i = 0; i <= p; i++) {
+    const theta = angle1 + (i * da);
+    const cos = Math.cos(theta);
+    const sin = Math.sin(theta);
+    const r = (a * b) / Math.sqrt(b * b * cos * cos + a * a * sin * sin);
+    const point: Point = [xc + Math.round(r * cos), yc + Math.round(r * sin)];
+    const key = point.join(',');
+    if (!used.has(key)) {
+      used.add(key);
+      points.push(point);
+    }
+  }
+  if (closed) {
+    const point: Point = [xc, yc];
+    const key = point.join(',');
+    if (!used.has(key)) {
+      used.add(key);
+      points.push(point);
+    }
+    polygon(points, filled, ctx, style);
+  } else {
+    linearPath(points, ctx, style);
+  }
+}
