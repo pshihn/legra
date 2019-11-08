@@ -124,63 +124,20 @@ export function computeBezierPoint(t: number, points: Point[]) {
   if (t === 0) {
     return points[0];
   }
-  const order = points.length - 1;
   if (t === 1) {
-    return points[order];
+    return points[points.length - 1];
   }
-  let p = points;
+  const p = points;
   const mt = 1 - t;
-
-  // constant?
-  if (order === 0) {
-    return points[0];
-  }
-
-  // linear?
-  if (order === 1) {
-    const ret: Point = [
-      mt * p[0][0] + t * p[1][0],
-      mt * p[0][1] + t * p[1][1]
-    ];
-    return ret;
-  }
-
-  // quadratic/cubic curve?
-  if (order < 4) {
-    const mt2 = mt * mt;
-    const t2 = t * t;
-    let d = 0;
-    let a = 0;
-    let b = 0;
-    let c = 0;
-    if (order === 2) {
-      p = [p[0], p[1], p[2], [0, 0]];
-      a = mt2;
-      b = mt * t * 2;
-      c = t2;
-    } else if (order === 3) {
-      a = mt2 * mt;
-      b = mt2 * t * 3;
-      c = mt * t2 * 3;
-      d = t * t2;
-    }
-    const ret: Point = [
-      a * p[0][0] + b * p[1][0] + c * p[2][0] + d * p[3][0],
-      a * p[0][1] + b * p[1][1] + c * p[2][1] + d * p[3][1]
-    ];
-    return ret;
-  }
-
-  // higher order curves: use de Casteljau's computation
-  const dCpts: Point[] = JSON.parse(JSON.stringify(points));
-  while (dCpts.length > 1) {
-    for (let i = 0; i < dCpts.length - 1; i++) {
-      dCpts[i] = [
-        dCpts[i][0] + (dCpts[i + 1][0] - dCpts[i][0]) * t,
-        dCpts[i][1] + (dCpts[i + 1][1] - dCpts[i][1]) * t
-      ];
-    }
-    dCpts.splice(dCpts.length - 1, 1);
-  }
-  return dCpts[0];
+  const mt2 = mt * mt;
+  const t2 = t * t;
+  const a = mt2 * mt;
+  const b = mt2 * t * 3;
+  const c = mt * t2 * 3;
+  const d = t * t2;
+  const ret: Point = [
+    a * p[0][0] + b * p[1][0] + c * p[2][0] + d * p[3][0],
+    a * p[0][1] + b * p[1][1] + c * p[2][1] + d * p[3][1]
+  ];
+  return ret;
 }
