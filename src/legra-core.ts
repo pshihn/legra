@@ -436,3 +436,9 @@ export function bezierCurve(x1: number, y1: number, cp1x: number, cp1y: number, 
   const luts = bezier.getLUT(bezier.length()).map<Point>((p) => [Math.round(p[0]), Math.round(p[1])]);
   linearPath(luts, ctx, style);
 }
+
+export function quadraticCurve(x1: number, y1: number, cpx: number, cpy: number, x2: number, y2: number, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+  const bezier = new Bezier([x1, y1], [cpx, cpy], [x2, y2]);
+  const luts = bezier.getLUT(bezier.length()).map<Point>((p) => [Math.round(p[0]), Math.round(p[1])]);
+  linearPath(luts, ctx, style);
+}

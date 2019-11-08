@@ -9,9 +9,14 @@ export class Bezier {
   private points: Point[] = [];
   private dpoints: Point[][] = [];
   private _lut: Point[] = [];
+  private order = 3;
 
-  constructor(p1: Point, p2: Point, p3: Point, p4: Point) {
-    this.points.push(p1, p2, p3, p4);
+  constructor(p1: Point, p2: Point, p3: Point, p4?: Point) {
+    this.points.push(p1, p2, p3);
+    if (p4) {
+      this.points.push(p4);
+    }
+    this.order = this.points.length - 1;
     this.update();
   }
 
@@ -26,10 +31,19 @@ export class Bezier {
 
   private derivative(t: number): Point {
     const mt = 1 - t;
-    const p = this.dpoints[0];
-    const a = mt * mt;
-    const b = mt * t * 2;
-    const c = t * t;
+    let a = 0;
+    let b = 0;
+    let c = 0;
+    let p = this.dpoints[0];
+    if (this.order === 2) {
+      p = [p[0], p[1], [0, 0]];
+      a = mt;
+      b = t;
+    } else if (this.order === 3) {
+      a = mt * mt;
+      b = mt * t * 2;
+      c = t * t;
+    }
     const ret: Point = [
       a * p[0][0] + b * p[1][0] + c * p[2][0],
       a * p[0][1] + b * p[1][1] + c * p[2][1]
