@@ -1,9 +1,13 @@
 {
   "name": "legra",
-  "version": "0.0.1",
-  "description": "A different kinda of graphics library... Coming soon!",
-  "main": "index.js",
+  "version": "0.0.2",
+  "description": "Create graphics using Lego like brick shapes.",
+  "main": "lib/legra.umd.js",
+  "module": "lib/legra.js",
+  "browser": "lib/legra.iife.js",
+  "types": "bin/legra.d.ts",
   "scripts": {
+    "build": "rm -rf bin && tsc && rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -11,12 +15,22 @@
     "url": "git+https://github.com/pshihn/legra.git"
   },
   "keywords": [
-    "graphics"
+    "graphics",
+    "lego",
+    "lego bricks",
+    "canvas",
+    "dataviz"
   ],
-  "author": "Preet Shihn",
+  "author": "Preet Shihn <preetshihn@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/pshihn/legra/issues"
   },
-  "homepage": "https://github.com/pshihn/legra#readme"
+  "homepage": "https://legrajs.com",
+  "devDependencies": {
+    "rollup": "^1.26.3",
+    "rollup-plugin-terser": "^5.1.2",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.2"
+  }
 }
