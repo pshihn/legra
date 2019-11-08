@@ -16,7 +16,7 @@
   <canvas width="800" height="800"></canvas>
 
   <script type="module">
-    import { rectangle, line, linearPath, ellipse, circle, polygon, arc } from '../bin/legra-core.js';
+    import { rectangle, line, linearPath, ellipse, circle, polygon, arc, bezierCurve } from '../bin/legra-core.js';
 
     const ctx = document.querySelector('canvas').getContext('2d');
 
@@ -98,8 +98,12 @@
     //   [14, 2]
     // ], false, ctx, styles)
 
-    arc(15, 15, 14, 14, Math.PI, Math.PI * 1.6, true, true, ctx, styles);
-    // export function arc(xc: number, yc: number, a: number, b: number, start: number, stop: number, closed: boolean, filled: boolean, ctx: CanvasRenderingContext2D, style: BrickStyleResolved) {
+    // arc(15, 15, 14, 14, Math.PI, Math.PI * 1.6, true, true, ctx, styles);
+
+    styles.brickSize = 20;
+    bezierCurve(3, 3, 8, 30, 18, 1, 22, 14, ctx, styles);
+    // styles.brickSize = 5;
+    // bezierCurve(68, 145, 74, 6, 143, 197, 138, 55, ctx, styles);
 
   </script>
 </body>
