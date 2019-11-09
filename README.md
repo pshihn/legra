@@ -1,2 +1,7 @@
+![legra logo](https://legrajs.com/images/logo.png)
+
 # legra
-A different kinda of graphics library... Coming soon!
+
+Legra (**Le**go brick **Gra**phics) is a small (*3.1kB gzipped*) JavaScript library that lets you draw using LEGO® like brick shapes on an HTML `<canvas>` element. This library defines basic graphics primitives like lines, rectangles, polygons, ellipses, bézier curves, etc. All shapes are drawn either outlined or filled in.
+
+For documentation and more: https://legrajs.com
