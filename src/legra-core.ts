@@ -1,6 +1,11 @@
 import { Point, Rectangle, EdgeEntry, ActiveEdgeEntry } from './geometry.js';
 import { Bezier } from './bezier.js';
 
+export interface ImageOrImageBitmap {
+  width: number;
+  height: number;
+}
+
 export interface BrickRenderOptions {
   color?: string;
   filled?: boolean;
@@ -447,5 +452,38 @@ export function quadraticCurve(x1: number, y1: number, cpx: number, cpy: number,
     polygon(luts, ctx, style);
   } else {
     linearPath(luts, ctx, style);
+  }
+}
+
+export function drawImage(ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved, image: ImageOrImageBitmap, dst: Point, dstSize?: Point, src?: Point, srcSize?: Point) {
+  const brickSize = style.brickSize;
+  if (!src) {
+    src = [0, 0];
+  }
+  if (!srcSize) {
+    srcSize = [image.width, image.height];
+  }
+  if (!dstSize) {
+    dstSize = [Math.round(srcSize[0] / brickSize), Math.round(srcSize[1] / brickSize)];
+  }
+  const [refW, refH] = dstSize;
+  const refCanvas = (typeof OffscreenCanvas !== 'undefined') ? new OffscreenCanvas(refW, refH) : new HTMLCanvasElement();
+  refCanvas.width = refW;
+  refCanvas.height = refH;
+  const refCtx = refCanvas.getContext('2d')!;
+  refCtx.drawImage(image as any, src[0], src[1], srcSize[0], srcSize[1], 0, 0, dstSize[0], dstSize[1]);
+  const imageData = refCtx.getImageData(0, 0, refW, refH);
+  for (let j = 0; j < refH; j++) {
+    for (let i = 0; i < refW; i++) {
+      const r = imageData.data[(j * refW * 4) + (i * 4)];
+      const g = imageData.data[(j * refW * 4) + (i * 4) + 1];
+      const b = imageData.data[(j * refW * 4) + (i * 4) + 2];
+      const pixelStyle: BrickRenderOptionsResolved = {
+        brickSize,
+        color: `rgb(${r}, ${g}, ${b})`,
+        filled: false
+      };
+      drawBrick(dst[0] + i, dst[1] + j, ctx, pixelStyle);
+    }
   }
 }
