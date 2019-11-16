@@ -1,6 +1,6 @@
 {
   "name": "legra",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Create graphics using Lego like brick shapes.",
   "main": "lib/legra.umd.js",
   "module": "lib/legra.js",
