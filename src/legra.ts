@@ -1,5 +1,7 @@
-import { BrickRenderOptions, BrickRenderOptionsResolved, line, linearPath, rectangle, circle, ellipse, polygon, arc, bezierCurve, quadraticCurve } from './legra-core.js';
+import { BrickRenderOptions, BrickRenderOptionsResolved, line, linearPath, rectangle, circle, ellipse, polygon, arc, bezierCurve, quadraticCurve, drawImage, ImageOrImageBitmap } from './legra-core.js';
 import { Point } from './geometry.js';
+
+export { ImageOrImageBitmap } from './legra-core';
 
 export default class Legra {
   private ctx: CanvasRenderingContext2D;
@@ -63,5 +65,9 @@ export default class Legra {
 
   quadraticCurve(x1: number, y1: number, cpx: number, cpy: number, x2: number, y2: number, options?: BrickRenderOptions) {
     quadraticCurve(x1, y1, cpx, cpy, x2, y2, this.ctx, this.opt(options));
+  }
+
+  drawImage(image: ImageOrImageBitmap, dst: Point, dstSize?: Point, src?: Point, srcSize?: Point) {
+    drawImage(this.ctx, this.opt(), image, dst, dstSize, src, srcSize);
   }
 }
