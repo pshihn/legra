@@ -438,6 +438,7 @@ export function arc(xc: number, yc: number, a: number, b: number, start: number,
 export function bezierCurve(x1: number, y1: number, cp1x: number, cp1y: number, cp2x: number, cp2y: number, x2: number, y2: number, ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved) {
   const bezier = new Bezier([x1, y1], [cp1x, cp1y], [cp2x, cp2y], [x2, y2]);
   const luts = bezier.getLUT(bezier.length()).map<Point>((p) => [Math.round(p[0]), Math.round(p[1])]);
+  luts.push([x2, y2]);
   if (style.filled) {
     polygon(luts, ctx, style);
   } else {
@@ -448,6 +449,7 @@ export function bezierCurve(x1: number, y1: number, cp1x: number, cp1y: number, 
 export function quadraticCurve(x1: number, y1: number, cpx: number, cpy: number, x2: number, y2: number, ctx: CanvasRenderingContext2D, style: BrickRenderOptionsResolved) {
   const bezier = new Bezier([x1, y1], [cpx, cpy], [x2, y2]);
   const luts = bezier.getLUT(bezier.length()).map<Point>((p) => [Math.round(p[0]), Math.round(p[1])]);
+  luts.push([x2, y2]);
   if (style.filled) {
     polygon(luts, ctx, style);
   } else {
