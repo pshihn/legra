@@ -469,7 +469,7 @@ export function drawImage(ctx: CanvasRenderingContext2D, style: BrickRenderOptio
     dstSize = [Math.round(srcSize[0] / brickSize), Math.round(srcSize[1] / brickSize)];
   }
   const [refW, refH] = dstSize;
-  const refCanvas = (typeof OffscreenCanvas !== 'undefined') ? new OffscreenCanvas(refW, refH) : new HTMLCanvasElement();
+  const refCanvas = (typeof OffscreenCanvas !== 'undefined') ? new OffscreenCanvas(refW, refH) : document.createElement('canvas');
   refCanvas.width = refW;
   refCanvas.height = refH;
   const refCtx = refCanvas.getContext('2d')!;
