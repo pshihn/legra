@@ -77,7 +77,7 @@ export function angle(o: Point, v1: Point, v2: Point): number {
   const dx1 = v1[0] - o[0];
   const dy1 = v1[1] - o[1];
   const dx2 = v2[0] - o[0];
-  const dy2 = v2[1] - o[1]
+  const dy2 = v2[1] - o[1];
   const cross = dx1 * dy2 - dy1 * dx2;
   const dot = dx1 * dx2 + dy1 * dy2;
   return Math.atan2(cross, dot);

@@ -8,7 +8,8 @@ export default class Legra {
   private defaultOptions: BrickRenderOptionsResolved = {
     brickSize: 24,
     color: '#2196F3',
-    filled: false
+    filled: false,
+    palette: []
   };
 
   constructor(ctx: CanvasRenderingContext2D, brickSize = 24, options?: BrickRenderOptions) {
@@ -20,6 +21,9 @@ export default class Legra {
       }
       if (typeof options.filled === 'boolean') {
         this.defaultOptions.filled = options.filled;
+      }
+      if (options.palette) {
+        this.defaultOptions.palette = options.palette;
       }
     }
   }
@@ -67,7 +71,7 @@ export default class Legra {
     quadraticCurve(x1, y1, cpx, cpy, x2, y2, this.ctx, this.opt(options));
   }
 
-  drawImage(image: ImageOrImageBitmap, dst: Point, dstSize?: Point, src?: Point, srcSize?: Point) {
-    drawImage(this.ctx, this.opt(), image, dst, dstSize, src, srcSize);
+  drawImage(image: ImageOrImageBitmap, dst: Point, dstSize?: Point, src?: Point, srcSize?: Point, options?: BrickRenderOptions) {
+    drawImage(this.ctx, this.opt(options), image, dst, dstSize, src, srcSize);
   }
 }

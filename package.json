@@ -1,6 +1,6 @@
 {
   "name": "legra",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Create graphics using Lego like brick shapes.",
   "main": "lib/legra.umd.js",
   "module": "lib/legra.js",
@@ -8,6 +8,7 @@
   "types": "bin/legra.d.ts",
   "scripts": {
     "build": "rm -rf bin && tsc && rollup -c",
+    "lint": "tslint -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,9 +29,9 @@
   },
   "homepage": "https://legrajs.com",
   "devDependencies": {
-    "rollup": "^1.27.0",
-    "rollup-plugin-terser": "^5.1.2",
+    "rollup": "^1.31.0",
+    "rollup-plugin-terser": "^5.2.0",
     "tslint": "^5.20.1",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.5"
   }
 }

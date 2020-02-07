@@ -1,5 +1,6 @@
 import { Point, Rectangle, EdgeEntry, ActiveEdgeEntry } from './geometry.js';
 import { Bezier } from './bezier.js';
+import { Color, closestColor } from './color';
 
 export interface ImageOrImageBitmap {
   width: number;
@@ -9,12 +10,14 @@ export interface ImageOrImageBitmap {
 export interface BrickRenderOptions {
   color?: string;
   filled?: boolean;
+  palette?: Color[];
 }
 
 export interface BrickRenderOptionsResolved extends BrickRenderOptions {
   brickSize: number;
   color: string;
   filled: boolean;
+  palette: Color[];
 }
 
 const radiusCache = new Map<number, number>();
@@ -475,15 +478,29 @@ export function drawImage(ctx: CanvasRenderingContext2D, style: BrickRenderOptio
   const refCtx = refCanvas.getContext('2d')!;
   refCtx.drawImage(image as any, src[0], src[1], srcSize[0], srcSize[1], 0, 0, dstSize[0], dstSize[1]);
   const imageData = refCtx.getImageData(0, 0, refW, refH);
+  const colorMap = new Map<string, Color>();
   for (let j = 0; j < refH; j++) {
     for (let i = 0; i < refW; i++) {
-      const r = imageData.data[(j * refW * 4) + (i * 4)];
-      const g = imageData.data[(j * refW * 4) + (i * 4) + 1];
-      const b = imageData.data[(j * refW * 4) + (i * 4) + 2];
+      let color: Color = {
+        r: imageData.data[(j * refW * 4) + (i * 4)],
+        g: imageData.data[(j * refW * 4) + (i * 4) + 1],
+        b: imageData.data[(j * refW * 4) + (i * 4) + 2]
+      };
+      if (style.palette && style.palette.length) {
+        const ckey = `${color.r},${color.g},${color.b}`;
+        if (colorMap.has(ckey)) {
+          color = colorMap.get(ckey)!;
+        } else {
+          const matchingColor = closestColor(color, style.palette);
+          colorMap.set(ckey, matchingColor);
+          color = matchingColor;
+        }
+      }
       const pixelStyle: BrickRenderOptionsResolved = {
         brickSize,
-        color: `rgb(${r}, ${g}, ${b})`,
-        filled: false
+        color: `rgb(${color.r}, ${color.g}, ${color.b})`,
+        filled: false,
+        palette: []
       };
       drawBrick(dst[0] + i, dst[1] + j, ctx, pixelStyle);
     }
